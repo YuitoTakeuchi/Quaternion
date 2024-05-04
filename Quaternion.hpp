@@ -26,6 +26,9 @@ public:
         z = 0;
         return *this;
     }
+    T operator()(int i) const {
+        return i == 0 ? w : (i == 1 ? x : (i == 2 ? y : z));
+    }
 
     template<typename U>
     T dot(const Quaternion<U>& q) const {
