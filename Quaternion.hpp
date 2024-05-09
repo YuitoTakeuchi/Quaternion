@@ -235,3 +235,17 @@ template<typename T, typename U>
 auto dot(const Quaternion<T>& q1, const Quaternion<U>& q2) -> decltype(q1.w * q2.w) {
     return q1.dot(q2);
 }
+
+template<typename T>
+Quaternion<T> from_euler(T roll, T pitch, T yaw) {
+    T cy = cos(yaw * 0.5);
+    T sy = sin(yaw * 0.5);
+    T cp = cos(pitch * 0.5);
+    T sp = sin(pitch * 0.5);
+    T cr = cos(roll * 0.5);
+    T sr = sin(roll * 0.5);
+    return {cy * cp * cr + sy * sp * sr,
+            cy * cp * sr - sy * sp * cr,
+            sy * cp * sr + cy * sp * cr,
+            sy * cp * cr - cy * sp * sr};
+}
