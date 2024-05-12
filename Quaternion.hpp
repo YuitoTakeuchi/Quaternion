@@ -10,6 +10,29 @@ public:
     template<typename Vector>
     Quaternion(const Vector& v) : w(v(0)), x(v(1)), y(v(2)), z(v(3)) {}
 
+    static Quaternion from_euler (T roll, T pitch, T yaw) {
+        T cy = cos(yaw * 0.5);
+        T sy = sin(yaw * 0.5);
+        T cp = cos(pitch * 0.5);
+        T sp = sin(pitch * 0.5);
+        T cr = cos(roll * 0.5);
+        T sr = sin(roll * 0.5);
+        return {cy * cp * cr + sy * sp * sr,
+                cy * cp * sr - sy * sp * cr,
+                sy * cp * sr + cy * sp * cr,
+                sy * cp * cr - cy * sp * sr};
+    }
+    static Quaternion from_axis_angle(const T& angle, const T& x, const T& y, const T& z) {
+        T s = sin(angle / 2);
+        return {cos(angle / 2), x * s, y * s, z * s};
+    }
+    static Quaternion zero() {
+        return {0, 0, 0, 0};
+    }
+    static Quaternion identity() {
+        return {1, 0, 0, 0};
+    }
+
     template<typename U>
     Quaternion operator=(const Quaternion<U>& q) {
         w = q.w;
@@ -100,6 +123,48 @@ public:
         m(2, 0) = 2.0*(q.x*q.z - q.w*q.y);
         m(2, 1) = 2.0*(q.y*q.z + q.w*q.x);
         m(2, 2) = q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z;
+    }
+    template<typename Mat>
+    Mat left_prod_mat() const {
+        Mat m;
+        m(0, 0) = w;
+        m(0, 1) = -x;
+        m(0, 2) = -y;
+        m(0, 3) = -z;
+        m(1, 0) = x;
+        m(1, 1) = w;
+        m(1, 2) = -z;
+        m(1, 3) = y;
+        m(2, 0) = y;
+        m(2, 1) = z;
+        m(2, 2) = w;
+        m(2, 3) = -x;
+        m(3, 0) = z;
+        m(3, 1) = -y;
+        m(3, 2) = x;
+        m(3, 3) = w;
+        return m;
+    }
+    template<typename Mat>
+    Mat right_prod_mat() const {
+        Mat m;
+        m(0, 0) = w;
+        m(0, 1) = -x;
+        m(0, 2) = -y;
+        m(0, 3) = -z;
+        m(1, 0) = x;
+        m(1, 1) = w;
+        m(1, 2) = z;
+        m(1, 3) = -y;
+        m(2, 0) = y;
+        m(2, 1) = -z;
+        m(2, 2) = w;
+        m(2, 3) = x;
+        m(3, 0) = z;
+        m(3, 1) = y;
+        m(3, 2) = -x;
+        m(3, 3) = w;
+        return m;
     }
 
     // w: real part, x, y, z: imaginary parts
@@ -234,18 +299,4 @@ inline Stream& operator<<(Stream& stream, const Quaternion<T>& q) {
 template<typename T, typename U>
 auto dot(const Quaternion<T>& q1, const Quaternion<U>& q2) -> decltype(q1.w * q2.w) {
     return q1.dot(q2);
-}
-
-template<typename T>
-Quaternion<T> from_euler(T roll, T pitch, T yaw) {
-    T cy = cos(yaw * 0.5);
-    T sy = sin(yaw * 0.5);
-    T cp = cos(pitch * 0.5);
-    T sp = sin(pitch * 0.5);
-    T cr = cos(roll * 0.5);
-    T sr = sin(roll * 0.5);
-    return {cy * cp * cr + sy * sp * sr,
-            cy * cp * sr - sy * sp * cr,
-            sy * cp * sr + cy * sp * cr,
-            sy * cp * cr - cy * sp * sr};
 }
