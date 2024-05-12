@@ -67,7 +67,7 @@ public:
         T angle = acos(dot);
         return (*this * sin(angle * (1 - t)) + q * sin(angle * t)) / sin(angle);
     }
-    void to_euler(T& yaw, T& pitch, T& roll) const {
+    void to_euler(T& roll, T& pitch, T& yaw) const {
         roll  = atan2(2.0 * (y*z + w*x), 1.0-2.0*(x*x+y*y));
         pitch = asin (2.0 * (w*y - x*z));
         yaw   = atan2(2.0 * (x*y + w*z), 1.0-2.0*(y*y+z*z));
