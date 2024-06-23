@@ -26,6 +26,24 @@ public:
         T s = sin(angle / 2);
         return {cos(angle / 2), x * s, y * s, z * s};
     }
+    template<typename Mat>
+    static Quaternion from_rotation_matrix(Mat R, int sgn = 1) {
+        T trace = R(0, 0) + R(1, 1) + R(2, 2);
+        
+        if (trace > 0) {
+            T s = 0.5 / sqrt(trace + 1.0);
+            return {0.25 / s, (R(2, 1) - R(1, 2)) * s, (R(0, 2) - R(2, 0)) * s, (R(1, 0) - R(0, 1)) * s};
+        } else if (R(0, 0) > R(1, 1) && R(0, 0) > R(2, 2)) {
+            T s = 2.0 * sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
+            return {(R(2, 1) - R(1, 2)) / s, 0.25 * s, (R(1, 0) + R(0, 1)) / s, (R(0, 2) + R(2, 0)) / s};
+        } else if (R(1, 1) > R(2, 2)) {
+            T s = 2.0 * sqrt(1.0 + R(1, 1) - R(0, 0) - R(2, 2));
+            return {(R(0, 2) - R(2, 0)) / s, (R(1, 0) + R(0, 1)) / s, 0.25 * s, (R(2, 1) + R(1, 2)) / s};
+        } else {
+            T s = 2.0 * sqrt(1.0 + R(2, 2) - R(0, 0) - R(1, 1));
+            return {(R(1, 0) - R(0, 1)) / s, (R(0, 2) + R(2, 0)) / s, (R(2, 1) + R(1, 2)) / s, 0.25 * s};
+        }
+    }
     static Quaternion zero() {
         return {0, 0, 0, 0};
     }
