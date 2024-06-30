@@ -11,37 +11,37 @@ public:
     Quaternion(const Vector& v) : w(v(0)), x(v(1)), y(v(2)), z(v(3)) {}
 
     static Quaternion from_euler (T roll, T pitch, T yaw) {
-        T cy = cos(yaw * 0.5);
-        T sy = sin(yaw * 0.5);
-        T cp = cos(pitch * 0.5);
-        T sp = sin(pitch * 0.5);
-        T cr = cos(roll * 0.5);
-        T sr = sin(roll * 0.5);
+        T cy = cos(yaw * T(0.5));
+        T sy = sin(yaw * T(0.5));
+        T cp = cos(pitch * T(0.5));
+        T sp = sin(pitch * T(0.5));
+        T cr = cos(roll * T(0.5));
+        T sr = sin(roll * T(0.5));
         return {cy * cp * cr + sy * sp * sr,
                 cy * cp * sr - sy * sp * cr,
                 sy * cp * sr + cy * sp * cr,
                 sy * cp * cr - cy * sp * sr};
     }
     static Quaternion from_axis_angle(const T& angle, const T& x, const T& y, const T& z) {
-        T s = sin(angle / 2);
-        return {cos(angle / 2), x * s, y * s, z * s};
+        T s = sin(T(0.5) * angle);
+        return {cos(T(0.5) * angle), x * s, y * s, z * s};
     }
     template<typename Mat>
     static Quaternion from_rotation_matrix(Mat R, int sgn = 1) {
         T trace = R(0, 0) + R(1, 1) + R(2, 2);
         
         if (trace > 0) {
-            T s = 0.5 / sqrt(trace + 1.0);
-            return {0.25 / s, (R(2, 1) - R(1, 2)) * s, (R(0, 2) - R(2, 0)) * s, (R(1, 0) - R(0, 1)) * s};
+            T s = T(0.5) / sqrt(trace + 1.0);
+            return {T(0.25) / s, (R(2, 1) - R(1, 2)) * s, (R(0, 2) - R(2, 0)) * s, (R(1, 0) - R(0, 1)) * s};
         } else if (R(0, 0) > R(1, 1) && R(0, 0) > R(2, 2)) {
-            T s = 2.0 * sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
-            return {(R(2, 1) - R(1, 2)) / s, 0.25 * s, (R(1, 0) + R(0, 1)) / s, (R(0, 2) + R(2, 0)) / s};
+            T s = T(2.0) * sqrt(T(1.0) + R(0, 0) - R(1, 1) - R(2, 2));
+            return {(R(2, 1) - R(1, 2)) / s, T(0.25) * s, (R(1, 0) + R(0, 1)) / s, (R(0, 2) + R(2, 0)) / s};
         } else if (R(1, 1) > R(2, 2)) {
-            T s = 2.0 * sqrt(1.0 + R(1, 1) - R(0, 0) - R(2, 2));
-            return {(R(0, 2) - R(2, 0)) / s, (R(1, 0) + R(0, 1)) / s, 0.25 * s, (R(2, 1) + R(1, 2)) / s};
+            T s = T(2.0) * sqrt(T(1.0) + R(1, 1) - R(0, 0) - R(2, 2));
+            return {(R(0, 2) - R(2, 0)) / s, (R(1, 0) + R(0, 1)) / s, T(0.25) * s, (R(2, 1) + R(1, 2)) / s};
         } else {
-            T s = 2.0 * sqrt(1.0 + R(2, 2) - R(0, 0) - R(1, 1));
-            return {(R(1, 0) - R(0, 1)) / s, (R(0, 2) + R(2, 0)) / s, (R(2, 1) + R(1, 2)) / s, 0.25 * s};
+            T s = T(2.0) * sqrt(T(1.0) + R(2, 2) - R(0, 0) - R(1, 1));
+            return {(R(1, 0) - R(0, 1)) / s, (R(0, 2) + R(2, 0)) / s, (R(2, 1) + R(1, 2)) / s, T(0.25) * s};
         }
     }
     static Quaternion zero() {
@@ -109,9 +109,9 @@ public:
         return (*this * sin(angle * (1 - t)) + q * sin(angle * t)) / sin(angle);
     }
     void to_euler(T& roll, T& pitch, T& yaw) const {
-        roll  = atan2(2.0 * (y*z + w*x), 1.0-2.0*(x*x+y*y));
-        pitch = asin (2.0 * (w*y - x*z));
-        yaw   = atan2(2.0 * (x*y + w*z), 1.0-2.0*(y*y+z*z));
+        roll  = atan2(T(2.0) * (y*z + w*x), T(1.0)-T(2.0)*(x*x+y*y));
+        pitch = asin (T(2.0) * (w*y - x*z));
+        yaw   = atan2(T(2.0) * (x*y + w*z), T(1.0)-T(2.0)*(y*y+z*z));
     }
 
     template<typename Mat>
@@ -119,13 +119,13 @@ public:
         Quaternion q = normalized();
         Mat m;
         m(0, 0) = q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z;
-        m(0, 1) = 2.0*(q.x*q.y - q.w*q.z);
-        m(0, 2) = 2.0*(q.x*q.z + q.w*q.y);
-        m(1, 0) = 2.0*(q.x*q.y + q.w*q.z);
+        m(0, 1) = T(2.0)*(q.x*q.y - q.w*q.z);
+        m(0, 2) = T(2.0)*(q.x*q.z + q.w*q.y);
+        m(1, 0) = T(2.0)*(q.x*q.y + q.w*q.z);
         m(1, 1) = q.w*q.w - q.x*q.x + q.y*q.y - q.z*q.z;
-        m(1, 2) = 2.0*(q.y*q.z - q.w*q.x);
-        m(2, 0) = 2.0*(q.x*q.z - q.w*q.y);
-        m(2, 1) = 2.0*(q.y*q.z + q.w*q.x);
+        m(1, 2) = T(2.0)*(q.y*q.z - q.w*q.x);
+        m(2, 0) = T(2.0)*(q.x*q.z - q.w*q.y);
+        m(2, 1) = T(2.0)*(q.y*q.z + q.w*q.x);
         m(2, 2) = q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z;
         return m;
     }
@@ -133,13 +133,13 @@ public:
     void rotation_matrix(Mat& m) const {
         Quaternion q = normalized();
         m(0, 0) = q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z;
-        m(0, 1) = 2.0*(q.x*q.y - q.w*q.z);
-        m(0, 2) = 2.0*(q.x*q.z + q.w*q.y);
-        m(1, 0) = 2.0*(q.x*q.y + q.w*q.z);
+        m(0, 1) = T(2.0)*(q.x*q.y - q.w*q.z);
+        m(0, 2) = T(2.0)*(q.x*q.z + q.w*q.y);
+        m(1, 0) = T(2.0)*(q.x*q.y + q.w*q.z);
         m(1, 1) = q.w*q.w - q.x*q.x + q.y*q.y - q.z*q.z;
-        m(1, 2) = 2.0*(q.y*q.z - q.w*q.x);
-        m(2, 0) = 2.0*(q.x*q.z - q.w*q.y);
-        m(2, 1) = 2.0*(q.y*q.z + q.w*q.x);
+        m(1, 2) = T(2.0)*(q.y*q.z - q.w*q.x);
+        m(2, 0) = T(2.0)*(q.x*q.z - q.w*q.y);
+        m(2, 1) = T(2.0)*(q.y*q.z + q.w*q.x);
         m(2, 2) = q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z;
     }
     template<typename Mat>
