@@ -31,7 +31,7 @@ class Quaternion {
   }
 
   template <typename Mat>
-  static Quaternion from_rotation_matrix(Mat R, int sgn = 1) {
+  static Quaternion from_rotation_matrix(Mat R) {
     T trace = R(0, 0) + R(1, 1) + R(2, 2);
 
     if (trace > 0) {
